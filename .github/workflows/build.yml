@@ -22,7 +22,7 @@ jobs:
         id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r27c
+          ndk-version: r29
           local-cache: false
           link-to-sdk: true
 
