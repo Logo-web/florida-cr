@@ -56,11 +56,11 @@ jobs:
             echo "=== apply patches to subprojects/$name ==="
             ( cd "subprojects/$name" && git am --3way "../../../patches/$name/"*.patch )
           done
-          # extend Florida's anti-anti-frida.py to also scrub bare frida/glib/GLib/etc.
+          # replace Florida's anti-anti-frida.py with our comprehensive version
           AAF=subprojects/frida-core/src/anti-anti-frida.py
           if [ -f "$AAF" ]; then
-            sed -i 's|all_patch_string = \[.*\]|all_patch_string = ["FridaScriptEngine","GLib-GIO","GDBusProxy","GumScript","GThread","GModule","GMainContext","GMainLoop","GDBusConnection","GObject","GLib","glib","gobject"]|' "$AAF"
-            grep all_patch_string "$AAF" | head -1
+            cp ../aaf-custom.py "$AAF"
+            echo "anti-anti-frida.py replaced with custom (frida+gum symbols + rodata reverse)"
           fi
           cd ..
           mkdir build-x64 && cd build-x64
