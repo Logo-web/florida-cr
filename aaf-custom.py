@@ -38,31 +38,27 @@ if __name__ == "__main__":
 
     # --- 2. reverse signature strings in .rodata (same length, consistent) ---
     # NOT touching protocol strings re.frida.* / frida:rpc (handled via context skip).
+    # NOTE: do NOT reverse bare "Frida"/"frida" in .rodata — it corrupts the
+    # GDBus interface re.frida.AgentSessionProvider and breaks server<->agent.
+    # gum/Gum are NOT protocol-relevant, so they are safe to scrub.
     fixed_tokens = [
         "FridaScriptEngine", "GLib-GIO", "GDBusProxy", "GumScript",
-        "Frida", "GObject", "GThread", "GModule", "GMainContext",
+        "GObject", "GThread", "GModule", "GMainContext",
         "GMainLoop", "GDBusConnection", "GLib", "glib", "gobject", "Gum",
     ]
     ctx_count = {}
     for section in binary.sections:
         if section.name != ".rodata":
             continue
-        content = bytes(section.content)
         for patch_str in fixed_tokens:
             for addr in section.search_all(patch_str):
                 patch = [ord(c) for c in patch_str[::-1]]
                 binary.patch_address(section.file_offset + addr, patch)
                 ctx_count[patch_str] = ctx_count.get(patch_str, 0) + 1
-        # bare lowercase frida / gum: reverse ONLY when not part of re.frida / frida:rpc
-        for tok in ["frida", "gum"]:
-            for addr in section.search_all(tok):
-                lo = max(0, addr - 3)
-                around = content[lo:addr + len(tok) + 4]
-                if b"re.frida" in around or b"frida:rpc" in around:
-                    continue
-                binary.patch_address(section.file_offset + addr,
-                                     [ord(c) for c in tok[::-1]])
-                ctx_count[tok] = ctx_count.get(tok, 0) + 1
+        # bare lowercase gum (NOT frida — protocol): reverse all occurrences
+        for addr in section.search_all("gum"):
+            binary.patch_address(section.file_offset + addr, [ord(c) for c in "mug"])
+            ctx_count["gum"] = ctx_count.get("gum", 0) + 1
     log_color(f"[*] reversed rodata strings: {ctx_count}")
 
     binary.write(input_file)
