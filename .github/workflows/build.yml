@@ -42,13 +42,14 @@ jobs:
           git config --global user.name "ci"
           git config --global user.email "ci@local"
           export ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}
-          FRIDA_TAG=17.15.1
+          FRIDA_TAG=17.8.2
           echo "NDK=$ANDROID_NDK_ROOT  pin frida=$FRIDA_TAG"
-          git clone --recurse-submodules https://github.com/frida/frida
+          git clone https://github.com/frida/frida
           cd frida
-          git checkout ${FRIDA_TAG} || true
+          git checkout ${FRIDA_TAG}
           git submodule update --init --recursive
-          echo "frida checkout: $(git describe --tags || true)"
+          echo "frida checkout: $(git describe --tags)"
+          echo "frida-core HEAD: $(git -C subprojects/frida-core rev-parse HEAD)"
           for path in ../patches/*; do
             name=$(basename "$path")
             [ -d "subprojects/$name" ] || { echo "skip $name"; continue; }
