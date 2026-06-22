@@ -45,6 +45,7 @@ if __name__ == "__main__":
         "FridaScriptEngine", "GLib-GIO", "GDBusProxy", "GumScript",
         "GObject", "GThread", "GModule", "GMainContext",
         "GMainLoop", "GDBusConnection", "GLib", "glib", "gobject", "Gum",
+        "Frida",  # capital GType prefix (FridaXyz) — NOT the lowercase re.frida protocol
     ]
     ctx_count = {}
     for section in binary.sections:
