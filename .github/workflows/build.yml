@@ -56,6 +56,12 @@ jobs:
             echo "=== apply patches to subprojects/$name ==="
             ( cd "subprojects/$name" && git am --3way "../../../patches/$name/"*.patch )
           done
+          # extend Florida's anti-anti-frida.py to also scrub bare frida/glib/GLib/etc.
+          AAF=subprojects/frida-core/src/anti-anti-frida.py
+          if [ -f "$AAF" ]; then
+            sed -i 's|all_patch_string = \[.*\]|all_patch_string = ["FridaScriptEngine","GLib-GIO","GDBusProxy","GumScript","Frida","frida","GThread","GModule","GMainContext","GMainLoop","GDBusConnection","GLib","glib"]|' "$AAF"
+            grep all_patch_string "$AAF" | head -1
+          fi
           cd ..
           mkdir build-x64 && cd build-x64
           ../frida/configure --host=android-x86_64
