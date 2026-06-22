@@ -59,7 +59,7 @@ jobs:
           # extend Florida's anti-anti-frida.py to also scrub bare frida/glib/GLib/etc.
           AAF=subprojects/frida-core/src/anti-anti-frida.py
           if [ -f "$AAF" ]; then
-            sed -i 's|all_patch_string = \[.*\]|all_patch_string = ["FridaScriptEngine","GLib-GIO","GDBusProxy","GumScript","Frida","frida","GThread","GModule","GMainContext","GMainLoop","GDBusConnection","GLib","glib"]|' "$AAF"
+            sed -i 's|all_patch_string = \[.*\]|all_patch_string = ["FridaScriptEngine","GLib-GIO","GDBusProxy","GumScript","GThread","GModule","GMainContext","GMainLoop","GDBusConnection","GObject","GLib","glib","gobject"]|' "$AAF"
             grep all_patch_string "$AAF" | head -1
           fi
           cd ..
